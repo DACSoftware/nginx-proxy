@@ -1,0 +1,46 @@
+{{ define "service_ws" }}
+
+{{ $host := .Host }}
+{{ $containers := .Containers }}
+{{ $CurrentContainer := .CurrentContainer }}
+
+{{ $serviceContainers := whereExist $containers "Env.VIRTUAL_WS_PORT" }}
+
+{{ if not (eq (len $serviceContainers) 0 ) }}
+
+upstream ws-{{ $host }} {
+{{ range $container := $serviceContainers }}
+	{{ $addrLen := len $container.Addresses }}
+
+	{{ range $knownNetwork := $CurrentContainer.Networks }}
+		{{ range $containerNetwork := $container.Networks }}
+			{{ if eq $knownNetwork.Name $containerNetwork.Name }}
+				## Can be connect with "{{ $containerNetwork.Name }}" network
+				{{ $port := $container.Env.VIRTUAL_WS_PORT }}
+				{{ $address := where $container.Addresses "Port" $port | first }}
+				{{ template "upstream" (dict "Container" $container "Address" $address "Network" $containerNetwork) }}
+			{{ end }}
+		{{ end }}
+	{{ end }}
+{{ end }}
+}
+
+{{ $default_host := or ($.Env.DEFAULT_HOST) "" }}
+{{ $default_server := index (dict $host "" $default_host "default_server") $host }}
+
+server {
+	server_name {{ $host }};
+	listen 3001 {{ $default_server }};
+	access_log /var/log/nginx/access-ws.log vhost;
+
+	location / {
+		proxy_pass http://ws-{{ trim $host }};
+		proxy_http_version 1.1;
+		proxy_set_header Upgrade $http_upgrade;
+		proxy_set_header Connection "upgrade";
+   	}
+}
+
+{{ end }}
+
+{{ end }}
