@@ -26,6 +26,16 @@ RUN wget https://github.com/jwilder/docker-gen/releases/download/$DOCKER_GEN_VER
 COPY . /app/
 WORKDIR /app/
 
+RUN cat \
+  tmpl/upstream.tmpl \
+  tmpl/default_503.tmpl \
+  tmpl/proxy_headers.tmpl \
+  tmpl/service/*.tmpl \
+  tmpl/host.tmpl \
+  tmpl/hosts.tmpl \
+  tmpl/main.tmpl \
+  > nginx.tmpl
+
 ENV DOCKER_HOST unix:///tmp/docker.sock
 
 VOLUME ["/etc/nginx/certs"]

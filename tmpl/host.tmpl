@@ -1,0 +1,11 @@
+{{ define "host" }}
+
+{{ $host := .Host }}
+{{ $containers := .Containers }}
+{{ $CurrentContainer := .CurrentContainer }}
+
+{{ template "service_http" (dict "Host" $host "Containers" $containers "CurrentContainer" $CurrentContainer) }} 
+{{ template "service_https" (dict "Host" $host "Containers" $containers "CurrentContainer" $CurrentContainer) }} 
+{{ template "service_ws" (dict "Host" $host "Containers" $containers "CurrentContainer" $CurrentContainer) }} 
+
+{{ end }}
