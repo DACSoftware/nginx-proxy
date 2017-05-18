@@ -1,0 +1,8 @@
+#!/bin/bash
+{{ $CurrentContainer := where $ "ID" .Docker.CurrentContainerID | first }}
+
+{{ range $host, $containers := groupByMulti $ "Env.VIRTUAL_HOST" "," }}
+
+{{ template "issue_cert" (dict "Host" $host "Containers" $containers "CurrentContainer" $CurrentContainer) }}
+
+{{ end }}

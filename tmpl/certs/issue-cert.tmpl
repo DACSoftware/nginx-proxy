@@ -1,0 +1,9 @@
+{{ define "issue_cert" }}
+    {{ $host := .Host }}
+
+    echo "Generating ssl certificates"
+    pushd /etc/nginx/certs
+    /opt/certificates/bin/issue-cert.sh --name {{ $host }} --domain {{ $host }}
+    popd
+
+{{ end }}

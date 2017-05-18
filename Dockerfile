@@ -6,6 +6,9 @@ RUN apt-get update \
  && apt-get install -y -q --no-install-recommends \
     ca-certificates \
     wget \
+    openssl \
+    git \
+    ssh \
  && apt-get clean \
  && rm -r /var/lib/apt/lists/*
 
@@ -23,6 +26,12 @@ RUN wget https://github.com/jwilder/docker-gen/releases/download/$DOCKER_GEN_VER
  && tar -C /usr/local/bin -xvzf docker-gen-linux-amd64-$DOCKER_GEN_VERSION.tar.gz \
  && rm /docker-gen-linux-amd64-$DOCKER_GEN_VERSION.tar.gz
 
+COPY ssh/known_hosts /root/.ssh/
+COPY phpdeployer.id_rsa /root/.ssh/id_rsa
+
+RUN git clone git@bitbucket.org:dacsoftware/certificates.git /opt/certificates
+RUN rm -r /root/.ssh/id_rsa
+
 COPY . /app/
 WORKDIR /app/
 
@@ -35,6 +44,11 @@ RUN cat \
   tmpl/hosts.tmpl \
   tmpl/main.tmpl \
   > nginx.tmpl
+
+RUN cat \
+  tmpl/certs/issue-cert.tmpl \
+  tmpl/certs/gen-certs.tmpl \
+  > certs.tmpl
 
 ENV DOCKER_HOST unix:///tmp/docker.sock
 
