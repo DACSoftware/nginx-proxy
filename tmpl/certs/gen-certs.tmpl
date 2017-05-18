@@ -3,6 +3,6 @@
 
 {{ range $host, $containers := groupByMulti $ "Env.VIRTUAL_HOST" "," }}
 
-{{ template "host" (dict "Host" $host "Containers" $containers "CurrentContainer" $CurrentContainer) }}
+{{ template "issue_cert" (dict "Host" $host "Containers" $containers "CurrentContainer" $CurrentContainer) }}
 
 {{ end }}

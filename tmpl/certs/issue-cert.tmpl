@@ -3,7 +3,7 @@
 
     echo "Generating ssl certificates"
     pushd /etc/nginx/certs
-    /opt/certificates/bin/issue-cert --name {{ $host }} --domain {{ $host }}
+    /opt/certificates/bin/issue-cert.sh --name {{ $host }} --domain {{ $host }}
     popd
 
 {{ end }}
