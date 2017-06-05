@@ -1,5 +1,7 @@
 {{ define "upstream" }}
-	{{ if .Address }}
+	{{ if and .Container.Env.VIRTUAL_HTTP_PORT (index .Container.Labels "io.rancher.container.name") }}
+		server {{ index .Container.Labels "io.rancher.container.name" }}:{{ .Container.Env.VIRTUAL_HTTP_PORT }};
+	{{ else if .Address }}
 		{{/* If we got the containers from swarm and this container's port is published to host, use host IP:PORT */}}
 		{{ if and .Container.Node.ID .Address.HostPort }}
 			# {{ .Container.Node.Name }}/{{ .Container.Name }}
